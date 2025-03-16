@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  user-db:
+    image: mysql:8.0
+    container_name: db
+    environment:
+      MYSQL_DATABASE: db
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 1234
+    ports:
+      - "3306:3306"
+    volumes:
+      - user-db-data:/var/lib/mysql
+
+  user-service:
+    build: ./user-service  # user-service의 Dockerfile 위치
+    container_name: user-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/db?useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: 1234
+    ports:
+      - "8081:8081"
+    depends_on:
+      - user-db
+
+volumes:
+  user-db-data:
